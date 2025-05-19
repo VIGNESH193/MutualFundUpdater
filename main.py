@@ -2,6 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import pandas as pd
 import requests
+from tqdm import tqdm
 
 # Initialize Firebase
 cred = credentials.Certificate("service-account.json")
@@ -34,7 +35,7 @@ def fetch_latest_fund_values():
 def update_firestore():
     """Update Firestore with latest fund NAVs."""
     latest_values = fetch_latest_fund_values()
-    for idx, row in latest_values.iterrows():
+    for idx, row in tqdm(latest_values.iterrows(), total=len(latest_values)):
         scheme_code = row["Scheme Code"]
         doc_ref = db.collection("mf_amfiindia").document(scheme_code)
         doc = doc_ref.get()
