@@ -9,11 +9,12 @@ from tqdm import tqdm
 cred = credentials.Certificate("service-account.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
+mf_info = db.collection("mutual_funds").document("info")
 
 def fetch_tracked_funds():
     """Fetch tracked funds from Firestore."""
-    tracked_fund_data = db.collection("mutual_funds").document("tracked_funds").get().to_dict()
-    tracked_funds = tracked_fund_data["funds"]
+    tracked_fund_data = mf_info.get().to_dict()
+    tracked_funds = tracked_fund_data["tracked_funds"]
     
     return tracked_funds
 
@@ -48,7 +49,7 @@ def update_firestore():
     latest_values = fetch_latest_fund_values()
     for idx, row in tqdm(latest_values.iterrows(), total=len(latest_values)):
         scheme_code = row["Scheme Code"]
-        doc_ref = db.collection("mf_live_price").document(scheme_code)
+        doc_ref = mf_info.collection("live_prices").document(scheme_code)
         doc = doc_ref.get()
         if not doc.exists:
             doc_ref.set({
