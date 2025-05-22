@@ -49,7 +49,7 @@ def update_firestore():
     latest_values = fetch_latest_fund_values()
     for idx, row in tqdm(latest_values.iterrows(), total=len(latest_values)):
         scheme_code = row["Scheme Code"]
-        doc_ref = mf_info.collection("live_prices").document(scheme_code)
+        doc_ref = mf_info.collection("funds").document(scheme_code)
         doc = doc_ref.get()
         if not doc.exists:
             doc_ref.set({
