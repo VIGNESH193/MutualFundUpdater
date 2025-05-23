@@ -50,12 +50,19 @@ def update_firestore():
     for idx, row in tqdm(latest_values.iterrows(), total=len(latest_values)):
         scheme_code = row["Scheme Code"]
         doc_ref = mf_info.collection("funds").document(scheme_code)
-        doc_ref.set({
-            "Scheme Code": scheme_code,
-            "Scheme Name": row["Scheme Name"],
-            "NAV Value": row["NAV Value"],
-            "NAV Date": row["NAV Date"]
-        })
+        doc = doc_ref.get()
+        if not doc.exists:
+            doc_ref.set({
+                "Scheme Code": scheme_code,
+                "Scheme Name": row["Scheme Name"],
+                "NAV Value": row["NAV Value"],
+                "NAV Date": row["NAV Date"]
+            })
+        else:
+            doc_ref.update({
+                "NAV Value": row["NAV Value"],
+                "NAV Date": row["NAV Date"]
+            })
 
 if __name__ == "__main__":
     update_firestore()
